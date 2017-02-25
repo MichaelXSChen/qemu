@@ -1035,7 +1035,7 @@ void qemu_savevm_state_complete_postcopy(QEMUFile *f)
     qemu_put_byte(f, QEMU_VM_EOF);
     qemu_fflush(f);
 }
-
+//GUESS (XS): get the size 
 void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only)
 {
     QJSON *vmdesc;
@@ -1064,9 +1064,15 @@ void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only)
         trace_savevm_section_start(se->idstr, se->section_id);
 
         save_section_header(f, se, QEMU_VM_SECTION_END);
-
+        //XS
         ret = se->ops->save_live_complete_precopy(f, se->opaque);
+
+
+
         trace_savevm_section_end(se->idstr, se->section_id, ret);
+        //xs END
+
+
         save_section_footer(f, se);
         if (ret < 0) {
             qemu_file_set_error(f, ret);

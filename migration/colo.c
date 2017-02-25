@@ -261,7 +261,7 @@ static uint64_t colo_receive_message_value(QEMUFile *f, uint32_t expect_msg,
     }
     return value;
 }
-
+// Start doing checkpoint
 static int colo_do_checkpoint_transaction(MigrationState *s,
                                           QEMUSizedBuffer *buffer)
 {
@@ -290,6 +290,9 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
         goto out;
     }
     vm_stop_force_state(RUN_STATE_COLO);
+    
+
+
     qemu_mutex_unlock_iothread();
     trace_colo_vm_state_change("run", "stop");
     /*
@@ -302,6 +305,8 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
 
     /* we call this api although this may do nothing on primary side */
     qemu_mutex_lock_iothread();
+    
+    //GUESS: DISK
     replication_do_checkpoint_all(&local_err);
     qemu_mutex_unlock_iothread();
     if (local_err) {

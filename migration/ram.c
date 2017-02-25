@@ -240,6 +240,7 @@ struct PageSearchStatus {
 };
 typedef struct PageSearchStatus PageSearchStatus;
 
+//GUESS HERE?
 static struct BitmapRcu {
     struct rcu_head rcu;
     /* Main migration bitmap */
@@ -1376,6 +1377,7 @@ static int ram_find_and_save_block(QEMUFile *f, bool last_stage,
     pss.offset = last_offset;
     pss.complete_round = false;
 
+    //init, to first block in list
     if (!pss.block) {
         pss.block = QLIST_FIRST_RCU(&ram_list.blocks);
     }
@@ -2088,6 +2090,12 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
 static int ram_save_complete(QEMUFile *f, void *opaque)
 {
     rcu_read_lock();
+
+    int64_t ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
+    
+
+
+    printf("ram_bitmap_pages :%d\n", ram_bitmap_pages);
 
     if (!migration_in_postcopy(migrate_get_current())) {
         migration_bitmap_sync();
