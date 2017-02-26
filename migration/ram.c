@@ -1368,6 +1368,7 @@ static int ram_find_and_save_block(QEMUFile *f, bool last_stage,
 {
     PageSearchStatus pss;
     MigrationState *ms = migrate_get_current();
+    //XS: The number of pages to be returned.
     int pages = 0;
     bool again, found;
     ram_addr_t dirty_ram_abs; /* Address of the start of the dirty page in
@@ -2122,20 +2123,22 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
     fprintf(stderr, "ram_bitmap_pages :%d\n", ram_bitmap_pages);
 
 
-    fprintf(stderr, "\nBefore *****\n");
-    unsigned long *bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
-    printbitmap(bitmap);
-    fprintf(stderr, "\n*************\n");
+    // fprintf(stderr, "\nBefore *****\n");
+    // unsigned long *bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
+    // printbitmap(bitmap);
+    // fprintf(stderr, "\n*************\n");
     
+
+    //XS: Important: This line will fit in the bit map;
     if (!migration_in_postcopy(migrate_get_current())) {
         migration_bitmap_sync();
     }
 
 
-    fprintf(stderr, "\nAfter *****\n");
-    bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
+    fprintf(stderr, "\n bitmap *****\n");
+    unsigned long *bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
     printbitmap(bitmap);
-    fprintf(stderr, "\n*************\n");
+    fprintf(stderr, "\n bitmap end*************\n");
 
 
     ram_control_before_iterate(f, RAM_CONTROL_FINISH);
@@ -2143,16 +2146,26 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
     /* try transferring iterative blocks of memory */
 
     /* flush all remaining blocks regardless of rate limiting */
+    fprintf(stderr, "\n counts***********\n");
+    int total = 0;
     while (true) {
-        int pages;
 
+        int pages;
+        
+        //XS: Get the page data
         pages = ram_find_and_save_block(f, !migration_in_colo_state(),
                                         &bytes_transferred);
+        total += pages; 
+
+
+        fprintf(stderr, "%d\n", pages);
         /* no more blocks to sent */
         if (pages == 0) {
             break;
         }
     }
+    fprintf(stderr, "[total] %d\n",total );
+    fprintf(stderr, "\ncounts end*********\n");
 
     flush_compressed_data(f);
     ram_control_after_iterate(f, RAM_CONTROL_FINISH);
