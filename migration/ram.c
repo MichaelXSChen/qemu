@@ -2102,10 +2102,10 @@ static char* long_to_binary(long l){
 static void printbitmap(unsigned long *bmap){
     int64_t ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
     long len =  BITS_TO_LONGS(ram_bitmap_pages);
-    printf("len: %d ", len);
+    fprintf(stderr, "len: %d ", len);
     int i;
     for (i=0; i< len; i++){
-        printf("[%d]: %s\n", i, long_to_binary(bmap[i]));
+        fprintf(stderr, "[%d]: %s\n", i, long_to_binary(bmap[i]));
     }
 
 }
@@ -2119,23 +2119,23 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
 
     //XS: For Getting the bitmap size;
     int64_t ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
-    printf("ram_bitmap_pages :%d\n", ram_bitmap_pages);
+    fprintf(stderr, "ram_bitmap_pages :%d\n", ram_bitmap_pages);
 
 
-    printf("Before *****\n");
+    fprintf(stderr, "\nBefore *****\n");
     unsigned long *bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
     printbitmap(bitmap);
-    printf("*************\n");
+    fprintf(stderr, "\n*************\n");
     
     if (!migration_in_postcopy(migrate_get_current())) {
         migration_bitmap_sync();
     }
 
 
-    printf("After *****\n");
+    fprintf(stderr, "\nAfter *****\n");
     bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
     printbitmap(bitmap);
-    printf("*************\n");
+    fprintf(stderr, "\n*************\n");
 
 
     ram_control_before_iterate(f, RAM_CONTROL_FINISH);
