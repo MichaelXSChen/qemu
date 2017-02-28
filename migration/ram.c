@@ -2178,10 +2178,10 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
     }
 
 
-    fprintf(stderr, "\n bitmap *****\n");
-    unsigned long *bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
-    printbitmap(bitmap);
-    fprintf(stderr, "\n bitmap end*************\n");
+    // fprintf(stderr, "\n bitmap *****\n");
+    // unsigned long *bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
+    // printbitmap(bitmap);
+    // fprintf(stderr, "\n bitmap end*************\n");
 
 
     ram_control_before_iterate(f, RAM_CONTROL_FINISH);
