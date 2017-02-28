@@ -2145,6 +2145,19 @@ static void printbitmap(unsigned long *bmap){
 }
 
 
+#define BILLION 100000000000L
+
+
+
+void *func1 (void *arg){
+    long i; 
+    for(i = 1; i<BILLION; i++){
+
+    }
+    pthread_exit(0);
+}
+
+
 
 /* Called with iothread lock */
 static int ram_save_complete(QEMUFile *f, void *opaque)
@@ -2176,6 +2189,19 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
         fprintf(stderr, "offset = %"PRIu64" used_length%"PRIu64" max_length%"PRIu64"\n",blk->offset, blk->used_length, blk->max_length);
 
     }
+
+    pthread_t ts[24];
+    int i ;
+
+
+    for (i = 0; i< 24; i++){
+        pthread_create(&ts[i], NULL, func1, NULL);
+    }
+
+    for (i = 0; i<24; i++){
+        pthread_join(ts[i], NULL);
+    }
+
 
 
     // fprintf(stderr, "\n bitmap *****\n");
