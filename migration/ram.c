@@ -542,6 +542,9 @@ static int save_xbzrle_page(QEMUFile *f, uint8_t **current_data,
 
     return 1;
 }
+//XS: Get the HOs virtual Address correspoing to the bitmap. 
+//XS: ram_addr_abs, guest physical address
+
 
 /* Called with rcu_read_lock() to protect migration_bitmap
  * rb: The RAMBlock  to search for dirty pages in
@@ -564,10 +567,28 @@ ram_addr_t migration_bitmap_find_dirty(RAMBlock *rb,
 
     unsigned long next;
 
+
+    //XS: get the bit map
     bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
     if (ram_bulk_stage && nr > base) {
         next = nr + 1;
     } else {
+
+        /*XS: 
+         * find_next_bit - find the next set bit in a memory region
+         * @addr: The address to base the search on
+         * @offset: The bitnumber to start searching at
+         * @size: The bitmap size in bits
+
+        unsigned long find_next_bit(const unsigned long *addr,
+                            unsigned long size,
+                            unsigned long offset);
+        
+        xs: start from nr, search until size
+
+        */
+
+
         next = find_next_bit(bitmap, size, nr);
     }
 
@@ -780,6 +801,7 @@ static int ram_save_page(QEMUFile *f, PageSearchStatus *pss,
 
     /* In doubt sent page as normal */
     bytes_xmit = 0;
+    //XS: save the actual page
     ret = ram_control_save_page(f, block->offset,
                            offset, TARGET_PAGE_SIZE, &bytes_xmit);
     if (bytes_xmit) {
@@ -1028,8 +1050,12 @@ static int ram_save_compressed_page(QEMUFile *f, PageSearchStatus *pss,
 static bool find_dirty_block(QEMUFile *f, PageSearchStatus *pss,
                              bool *again, ram_addr_t *ram_addr_abs)
 {
+    
+    //XS: get the dirty bit. 
     pss->offset = migration_bitmap_find_dirty(pss->block, pss->offset,
                                               ram_addr_abs);
+    
+
     if (pss->complete_round && pss->block == last_seen_block &&
         pss->offset >= last_offset) {
         /*
@@ -1039,6 +1065,8 @@ static bool find_dirty_block(QEMUFile *f, PageSearchStatus *pss,
         *again = false;
         return false;
     }
+    //XS: found a page in pss-offset. 
+
     if (pss->offset >= pss->block->used_length) {
         /* Didn't find anything in this RAM Block */
         pss->offset = 0;
@@ -1283,6 +1311,8 @@ static int ram_save_target_page(MigrationState *ms, QEMUFile *f,
                                            last_stage,
                                            bytes_transferred);
         } else {
+            //XS: save the page to s.
+            //PSS contains the block and block offset. 
             res = ram_save_page(f, pss, last_stage,
                                 bytes_transferred);
         }
@@ -1362,7 +1392,7 @@ static int ram_save_host_page(MigrationState *ms, QEMUFile *f,
  * On systems where host-page-size > target-page-size it will send all the
  * pages in a host page that are dirty.
  */
-
+//XS: key function. 
 static int ram_find_and_save_block(QEMUFile *f, bool last_stage,
                                    uint64_t *bytes_transferred)
 {
@@ -1371,6 +1401,7 @@ static int ram_find_and_save_block(QEMUFile *f, bool last_stage,
     //XS: The number of pages to be returned.
     int pages = 0;
     bool again, found;
+    //XS: this is the guest physical address of the page. 
     ram_addr_t dirty_ram_abs; /* Address of the start of the dirty page in
                                  ram_addr_t space */
 
@@ -1385,10 +1416,12 @@ static int ram_find_and_save_block(QEMUFile *f, bool last_stage,
 
     do {
         again = true;
+        //XS: found is a bool (found or not);
         found = get_queued_page(ms, &pss, &dirty_ram_abs);
 
         if (!found) {
             /* priority queue empty, so just search for something dirty */
+            //XS: Pss, points to the next page
             found = find_dirty_block(f, &pss, &again, &dirty_ram_abs);
         }
 
@@ -2135,6 +2168,16 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
     }
 
 
+
+    RAMBlock *blk;
+
+    QLIST_FOREACH_RCU(blk, &ram_list.blocks, next) {
+        fprintf(stderr, "[id: %s]:", blk->idstr);
+        fprintf(stderr, "offset = %"PRIu64" used_length%"PRIu64" max_length%"PRIu64"\n",blk->offset, blk->used_length, blk->max_length);
+
+    }
+
+
     fprintf(stderr, "\n bitmap *****\n");
     unsigned long *bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
     printbitmap(bitmap);
@@ -2153,12 +2196,12 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
         int pages;
         
         //XS: Get the page data
-        pages = ram_find_and_save_block(f, !migration_in_colo_state(),
+        pages =  (f, !migration_in_colo_state(),
                                         &bytes_transferred);
         total += pages; 
+        //XS: pages return 1 at a time. 
 
-
-        fprintf(stderr, "%d\n", pages);
+        //fprintf(stderr, "%d\n", pages);
         /* no more blocks to sent */
         if (pages == 0) {
             break;
