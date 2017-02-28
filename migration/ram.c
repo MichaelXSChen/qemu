@@ -2196,7 +2196,7 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
         int pages;
         
         //XS: Get the page data
-        pages =  (f, !migration_in_colo_state(),
+        pages = ram_find_and_save_block (f, !migration_in_colo_state(),
                                         &bytes_transferred);
         total += pages; 
         //XS: pages return 1 at a time. 
