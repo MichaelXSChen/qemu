@@ -14,6 +14,7 @@ Say if the tree has `x` leaf (which means `x` pages in our project), then
 	childer_of_node (y) = (2*y +1, 2 *y +2)
 
 mapping: 
+
 	x[i] -> nodes[j]:
 		if i < 2 *( x - 2 ^ l): j=  (2 ^ th - 2) + i; 
 		else: j = i - (2 *( x - 2 ^ l)) + (nnodes - 1)/2 -1 
