@@ -2145,20 +2145,20 @@ static void printbitmap(unsigned long *bmap){
 }
 
 
-#define BILLION 100000000000L
+// #define BILLION 100000000000L
 
 
 
-void *func1 (void *arg){
-    long i; 
-    for(i = 1; i<BILLION; i++){
-        int ii; 
-        for(ii = 1; i<10; i++){
+// void *func1 (void *arg){
+//     long i; 
+//     for(i = 1; i<BILLION; i++){
+//         int ii; 
+//         for(ii = 1; i<10; i++){
         
-        }
-    }
-    pthread_exit(0);
-}
+//         }
+//     }
+//     pthread_exit(0);
+// }
 
 
 
@@ -2193,18 +2193,18 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
 
     }
 
-    pthread_t ts[24];
-    int i ;
+    // pthread_t ts[24];
+    // int i ;
 
 
-    for (i = 0; i< 24; i++){
-        pthread_create(&ts[i], NULL, func1, NULL);
-    }
-    printf("joined\n");
-    for (i = 0; i<24; i++){
-        pthread_join(ts[i], NULL);
-    }
-    printf("joined\n");
+    // for (i = 0; i< 24; i++){
+    //     pthread_create(&ts[i], NULL, func1, NULL);
+    // }
+    // printf("joined\n");
+    // for (i = 0; i<24; i++){
+    //     pthread_join(ts[i], NULL);
+    // }
+    // printf("joined\n");
 
 
 
