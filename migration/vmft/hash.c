@@ -65,13 +65,14 @@ static merkle_tree_t *mtree;
 
 
 void *compute_thread_func(void *arg){
-	int index = *(int *)arg;
+	int t = *(int *)arg; //The thread index of the thread
 	
 	while(1){
-		pthread_mutex_lock(&locks[index]);
-		pthread_cond_wait(&conds[index], &locks[index]);
-		pthread_mutex_unlock(&locks[index]);
+		pthread_mutex_lock(&locks[t]);
+		pthread_cond_wait(&conds[t], &locks[t]);
+		pthread_mutex_unlock(&locks[t]);
 	}
+	
 
 
 
