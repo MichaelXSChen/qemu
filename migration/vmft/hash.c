@@ -192,7 +192,7 @@ static void update_dirty_indices(unsigned long *bitmap, unsigned long len){
 }
 //Construct a complete binary tree as http://mathworld.wolfram.com/images/eps-gif/CompleteBinaryTree_1000.gif
 
-merkle_tree_t build_merkle_tree (unsigned long *xor_bitmap, unsigned long len){
+void build_merkle_tree (unsigned long *xor_bitmap, unsigned long len){
 	dirty_count = 0;
 	update_dirty_indices(xor_bitmap, len);
 

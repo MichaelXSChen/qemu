@@ -262,6 +262,7 @@ static uint64_t colo_receive_message_value(QEMUFile *f, uint32_t expect_msg,
     return value;
 }
 // Start doing checkpoint
+//xs: 
 static int colo_do_checkpoint_transaction(MigrationState *s,
                                           QEMUSizedBuffer *buffer)
 {
@@ -320,6 +321,7 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
 
     qemu_mutex_lock_iothread();
     /*
+    * xs: save sate 
     * Only save VM's live state, which not including device state.
     * TODO: We may need a timeout mechanism to prevent COLO process
     * to be blocked here.

@@ -16,8 +16,11 @@
 #endif
 
 
+//Init global variables (locks, conds), call it once is enought
+void init(unsigned long len);
 
+void build_merkle_tree (unsigned long *xor_bitmap, unsigned long len);
 
-
+void compute_hash_list(unsigned long *xor_bitmap, unsigned long len);
 
 #endif //MEM_COMPARE_HASH_H
