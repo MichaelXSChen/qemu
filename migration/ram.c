@@ -2913,10 +2913,10 @@ void colo_flush_ram_cache(void)
     }
 
     printf("\n\n colo's counter: both_dirty=%"PRIu64", host_dirty=%"PRIu64"\n", both_dirty, host_dirty); 
-    printf("[Only primary] dirty =%"PRIu64", same =%"PRIu64 ", same rate = %"PRIu64"\n", only_primary_diry, primary_same, primary_same * 100 /only_primary_diry);
-    printf("[Only backup] dirty =%"PRIu64", same =%"PRIu64 ", same rate = %"PRIu64"\n", only_backup_dirty, backup_same, backup_same * 100 /only_backup_dirty);
-    printf("[both dirty] dirty =%"PRIu64", same =%"PRIu64 ", same rate = %"PRIu64"\n", both_dirty, both_same, both_same * 100 /both_dirty);
-    printf("[*Total*] dirty =%"PRIu64", same =%"PRIu64 ", same rate = %"PRIu64"\n", total_copy, total_same, total_same * 100 /total_copy);
+    printf("[Only primary] dirty =%"PRIu64", same =%"PRIu64 "\n", only_primary_diry, primary_same);
+    printf("[Only backup] dirty =%"PRIu64", same =%"PRIu64 "\n", only_backup_dirty, backup_same);
+    printf("[both dirty] dirty =%"PRIu64", same =%"PRIu64 "\n", both_dirty, both_same);
+    printf("[*Total*] dirty =%"PRIu64", same =%"PRIu64 "\n", total_copy, total_same);
     printf("***********\n\n\n");
 
 
