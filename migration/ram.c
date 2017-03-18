@@ -2841,6 +2841,11 @@ void colo_flush_ram_cache(void)
     ram_addr_t offset = 0, host_off = 0, cache_off = 0;
     uint64_t host_dirty = 0, both_dirty = 0;
 
+    uint64_t only_backup_dirty =0, backup_same=0;
+    uint64_t only_primary_diry =0, primary_same = 0;
+    uint64_t total_copy = 0, total_same = 0;
+    uint64_t both_same = 0;
+
     trace_colo_flush_ram_cache_begin(migration_dirty_pages);
     address_space_sync_dirty_bitmap(&address_space_memory);
 
@@ -2864,15 +2869,59 @@ void colo_flush_ram_cache(void)
             if (host_off <= cache_off) {
                 offset = host_off;
                 host_dirty++;
-                both_dirty += (host_off == cache_off);
+                
+                if (host_off == cache_off){
+                    //xs: both dirty
+                    both_dirty++;
+                    dst_host = block->host + offset;
+                    src_host = block->colo_cache + offset;
+                    if (memcmp(dst_host, src_host,TARGET_PAGE_SIZE) == 0){
+                        both_same ++;
+                    }
+
+                }
+                else{
+                    //xs: only_backup_dirty; 
+                    only_backup_dirty++;
+                    dst_host = block->host + offset;
+                    src_host = block->colo_cache + offset;
+                    if (memcmp(dst_host, src_host,TARGET_PAGE_SIZE) == 0){
+                        backup_same++;
+                    } 
+                }
+
             } else {
+                //xs: only primary dirty
+                only_primary_diry++;
+                dst_host = block->host + offset;
+                src_host = block->colo_cache + offset;
+                if (memcmp(dst_host, src_host,TARGET_PAGE_SIZE) == 0){
+                    primary_same++;
+                }
+
                 offset = cache_off;
             }
             dst_host = block->host + offset;
             src_host = block->colo_cache + offset;
+            if (memcmp(dst_host, src_host,TARGET_PAGE_SIZE) == 0){
+                total_same++;
+            }
+            total_copy++;
+
             memcpy(dst_host, src_host, TARGET_PAGE_SIZE);
         }
     }
+
+    printf("\n\n colo's counter: both_dirty=%"PRIu64", host_dirty=%"PRIu64"\n", both_dirty, host_dirty); 
+    printf("[Only primary] dirty =%"PRIu64", same =%"PRIu64, "same rate = %"PRIu64"\n", only_primary_diry, primary_same, primary_same * 100 /only_primary_diry);
+    printf("[Only backup] dirty =%"PRIu64", same =%"PRIu64, "same rate = %"PRIu64"\n", only_backup_dirty, backup_same, backup_same * 100 /only_backup_dirty);
+    printf("[both dirty] dirty =%"PRIu64", same =%"PRIu64, "same rate = %"PRIu64"\n", both_dirty, both_same, both_same * 100 /both_dirty);
+    printf("[*Total*] dirty =%"PRIu64", same =%"PRIu64, "same rate = %"PRIu64"\n", total_copy, total_same, total_same * 100 /total_copy);
+    printf("***********\n\n\n");
+
+
+
+
     rcu_read_unlock();
     assert(migration_dirty_pages == 0);
     trace_colo_flush_ram_cache_begin(host_dirty);
