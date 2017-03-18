@@ -2219,7 +2219,7 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
     /* try transferring iterative blocks of memory */
 
     /* flush all remaining blocks regardless of rate limiting */
-    fprintf(stderr, "\n counts***********\n");
+    //fprintf(stderr, "\n counts***********\n");
     int total = 0;
     while (true) {
 
@@ -2237,8 +2237,8 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
             break;
         }
     }
-    fprintf(stderr, "[total] %d\n",total );
-    fprintf(stderr, "\ncounts end*********\n");
+    //fprintf(stderr, "[total] %d\n",total );
+    //fprintf(stderr, "\ncounts end*********\n");
 
     flush_compressed_data(f);
     ram_control_after_iterate(f, RAM_CONTROL_FINISH);
